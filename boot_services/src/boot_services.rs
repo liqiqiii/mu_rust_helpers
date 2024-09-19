@@ -452,11 +452,14 @@ pub trait BootServices: Sized {
     ) -> Result<&'static mut I, efi::Status> {
         //SAFETY: The generic Protocol ensure that the interfaces is the right type for the specified protocol.
         unsafe {
-            self.locate_protocol_unchecked(
+            match self.locate_protocol_unchecked(
                 protocol.protocol_guid(),
                 registration.map_or(ptr::null_mut(), |r| r.as_ptr()),
-            )
-            .map(|ptr| (ptr as *mut I).as_mut().unwrap())
+            ) {
+                Ok(interface) if interface.is_null() => Err(efi::Status::SUCCESS),
+                Ok(interface) => Ok((interface as *mut I).as_mut().unwrap()),
+                Err(status) => Err(status),
+            }
         }
     }
 
