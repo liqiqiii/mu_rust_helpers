@@ -378,11 +378,11 @@ impl RuntimeServices for StandardRuntimeServices<'_> {
         if get_time as usize == 0 {
             panic!("function not initialize.")
         }
-        let mut time: MaybeUninit::<efi::Time> = MaybeUninit::zeroed();
-        let mut time_capabilities: MaybeUninit::<efi::TimeCapabilities> = MaybeUninit::zeroed();
-        let status = get_time(time.as_mut_ptr(), time_capabilities.as_mut_ptr());
+        let mut time: efi::Time = Default::default();
+        let mut time_capabilities: efi::TimeCapabilities = efi::TimeCapabilities{resolution:0, accuracy:0, sets_to_zero: 0.into()};
+        let status = get_time(&mut time as *mut efi::Time, &mut time_capabilities as *mut efi::TimeCapabilities);
         match status {
-           efi::Status::SUCCESS => Ok((time.assume_init(), time_capabilities.assume_init())),
+           efi::Status::SUCCESS => Ok((time, time_capabilities)),
            some_error => Err(some_error)
         }
     }
