@@ -102,7 +102,7 @@ pub trait RuntimeServices: Sized {
     ///   7.1.1. EFI_RUNTIME_SERVICES.ResetSystem()
     /// </a>
     fn reset_system (
-      self,
+      &self,
       reset_type: u32,
       reset_status: efi::Status,
       data_size: usize,
@@ -388,7 +388,7 @@ pub trait RuntimeServices: Sized {
 impl RuntimeServices for StandardRuntimeServices<'_> {
 
   fn reset_system (
-    self,
+    &self,
     reset_type: u32,
     reset_status: efi::Status,
     data_size: usize,
