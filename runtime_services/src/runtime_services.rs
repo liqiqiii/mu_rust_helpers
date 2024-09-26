@@ -95,6 +95,19 @@ unsafe impl Send for StandardRuntimeServices<'static> {}
 
 /// Interface for Rust-friendly wrappers of the UEFI Runtime Services
 pub trait RuntimeServices: Sized {
+      /// Create an event.
+    ///
+    /// UEFI Spec Documentation:
+    /// <a href="https://uefi.org/specs/UEFI/2.10/08_Services_Runtime_Services.html#reset-system" target="_blank">
+    ///   7.1.1. EFI_RUNTIME_SERVICES.ResetSystem()
+    /// </a>
+    fn reset_system (
+      self,
+      reset_type: u32,
+      reset_status: efi::Status,
+      data_size: usize,
+      reset_data: *mut c_void,
+    );
     /// Get the time.
     ///
     /// UEFI Spec Documentation: [8.2.3. EFI_RUNTIME_SERVICES.SetVariable()](https://uefi.org/specs/UEFI/2.10/08_Services_Runtime_Services.html#setvariable)
@@ -373,6 +386,21 @@ pub trait RuntimeServices: Sized {
 }
 
 impl RuntimeServices for StandardRuntimeServices<'_> {
+
+  fn reset_system (
+    self,
+    reset_type: u32,
+    reset_status: efi::Status,
+    data_size: usize,
+    reset_data: *mut c_void,
+  ) {
+    let reset_system = self.efi_runtime_services().reset_system;
+    if reset_system as usize == 0 {
+      panic!("function not initialize.")
+    }
+    reset_system(reset_type, reset_status, data_size, reset_data);
+  }
+
     unsafe fn get_time_unchecked(&self) -> Result<(Time, TimeCapabilities), efi::Status> {
         let get_time = self.efi_runtime_services().get_time;
         if get_time as usize == 0 {
