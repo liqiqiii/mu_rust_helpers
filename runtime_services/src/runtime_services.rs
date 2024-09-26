@@ -105,7 +105,6 @@ pub trait RuntimeServices: Sized {
       &self,
       reset_type: u32,
       reset_status: efi::Status,
-      data_size: usize,
       reset_data: &[u8],
     );
     /// Get the time.
@@ -391,7 +390,6 @@ impl RuntimeServices for StandardRuntimeServices<'_> {
     &self,
     reset_type: u32,
     reset_status: efi::Status,
-    data_size: usize,
     reset_data: &[u8],
   ) {
     let reset_system = self.efi_runtime_services().reset_system;
@@ -399,7 +397,7 @@ impl RuntimeServices for StandardRuntimeServices<'_> {
       panic!("function not initialize.")
     }
 
-    reset_system(reset_type, reset_status, data_size, reset_data.as_ptr() as *mut c_void);
+    reset_system(reset_type, reset_status, reset_data.len(), reset_data.as_ptr() as *mut c_void);
   }
 
     unsafe fn get_time_unchecked(&self) -> Result<(Time, TimeCapabilities), efi::Status> {
