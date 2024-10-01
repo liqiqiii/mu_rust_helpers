@@ -122,7 +122,7 @@ pub trait RuntimeServices: Sized {
     /// </a>
     fn reset_system (
       self,
-      reset_type: u32,
+      reset_type: efi::ResetType,
       reset_status: efi::Status,
       data_size: usize,
       reset_data: *mut c_void,
@@ -133,7 +133,7 @@ impl RuntimeServices for StandardRuntimeServices<'_> {
 
   fn reset_system (
     self,
-    reset_type: u32,
+    reset_type: efi::ResetType,
     reset_status: efi::Status,
     data_size: usize,
     reset_data: *mut c_void,
